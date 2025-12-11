@@ -1,0 +1,54 @@
+
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: unitask
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: unitask_db
+    networks:
+      - microservices-network
+
+  user-service:
+    build: ./user-service
+    ports:
+      - "3001:3001"
+    networks:
+      - microservices-network
+
+  task-service:
+    build: ./task-service
+    ports:
+      - "3002:3002"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=unitask
+      - DB_PASS=password
+      - DB_NAME=unitask_db
+    restart: always  
+    networks:
+      - microservices-network
+
+  api-gateway:
+    build: ./api-gateway
+    ports:
+      - "3000:3000"
+    depends_on:
+      - user-service
+      - task-service
+    networks:
+      - microservices-network
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "80:80"
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
