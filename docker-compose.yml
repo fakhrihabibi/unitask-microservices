@@ -2,7 +2,7 @@
 
 services:
   db:
-    image: postgres:15-alpine
+    image: postgres:15
     environment:
       POSTGRES_USER: unitask
       POSTGRES_PASSWORD: password
@@ -45,7 +45,7 @@ services:
   frontend:
     build: ./frontend
     ports:
-      - "80:80"
+      - "8080:80"
     networks:
       - microservices-network
 
