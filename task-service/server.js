@@ -50,5 +50,13 @@ app.put('/:id/status', async (req, res) => {
     } catch (e) { res.status(500).json(e); }
 });
 
+// --- FITUR BARU: HAPUS TUGAS ---
+app.delete('/:id', async (req, res) => {
+    try {
+        await pool.query("DELETE FROM tasks WHERE id = $1", [req.params.id]);
+        res.json({ message: "Task deleted" });
+    } catch (e) { res.status(500).json(e); }
+});
+
 const PORT = 3002;
 app.listen(PORT, () => console.log(`Task Service running on port ${PORT}`));
