@@ -3,13 +3,14 @@
 services:
   db:
     image: postgres:15
+    ports:
+      - "5432:5432"  # TAMBAHKAN BARIS INI
     environment:
       POSTGRES_USER: unitask
       POSTGRES_PASSWORD: password
       POSTGRES_DB: unitask_db
     networks:
       - microservices-network
-
   user-service:
     build: ./user-service
     ports:
