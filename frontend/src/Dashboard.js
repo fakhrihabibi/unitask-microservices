@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
+import Swal from 'sweetalert2';
 
 function Dashboard({ onLogout }) {
     // State Data
     const [tasks, setTasks] = useState([]);
-    const [users, setUsers] = useState([]);
     const [form, setForm] = useState({ title: '', deadline_date: '', deadline_time: '' });
 
     // --- FETCH DATA (Langsung dijalankan saat buka web) ---
@@ -22,51 +22,10 @@ function Dashboard({ onLogout }) {
             const dataTasks = await resTasks.json();
             setTasks(dataTasks);
 
-            // Fetch Users (Protected)
-            const resUsers = await fetch('http://localhost:3000/api/users', {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
-            if (resUsers.ok) {
-                const dataUsers = await resUsers.json();
-                setUsers(dataUsers);
-            } else {
-                console.error("Gagal load users:", resUsers.status);
-            }
-
         } catch (e) { console.error("Gagal ambil data:", e); }
     };
 
     useEffect(() => { refreshData(); }, []);
-
-    // --- LOGIC ADMIN USER ---
-    const handleAddUser = async (e) => {
-        e.preventDefault();
-        const name = e.target.name.value;
-        const nim = e.target.nim.value;
-        const role = e.target.role.value;
-        const password = e.target.password.value;
-
-        await fetch('http://localhost:3000/api/users', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
-            },
-            body: JSON.stringify({ name, nim, role, password })
-        });
-        e.target.reset();
-        refreshData();
-        alert("User berhasil ditambahkan!");
-    };
-
-    const handleDeleteUser = async (id) => {
-        if (!window.confirm("Hapus user ini?")) return;
-        await fetch(`http://localhost:3000/api/users/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-        });
-        refreshData();
-    };
 
     // --- LOGIC TAMBAH TUGAS ---
     const handleSubmit = async (e) => {
@@ -79,7 +38,17 @@ function Dashboard({ onLogout }) {
             });
             setForm({ title: '', deadline_date: '', deadline_time: '' });
             await refreshData();
-        } catch (e) { alert("Gagal koneksi ke server"); }
+            Swal.fire({
+                icon: 'success',
+                title: 'Tugas Tersimpan',
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 3000
+            });
+        } catch (e) {
+            Swal.fire('Error', 'Gagal koneksi ke server', 'error');
+        }
     };
 
     // --- LOGIC UPDATE STATUS ---
@@ -93,12 +62,24 @@ function Dashboard({ onLogout }) {
     };
 
     // --- LOGIC HAPUS TUGAS ---
+    // --- LOGIC HAPUS TUGAS ---
     const deleteTask = async (id) => {
-        if (window.confirm("Yakin mau hapus tugas ini?")) {
+        const result = await Swal.fire({
+            title: 'Hapus Tugas?',
+            text: "Yakin tugas ini sudah selesai atau mau dihapus?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, Hapus'
+        });
+
+        if (result.isConfirmed) {
             await fetch(`http://localhost:3000/api/tasks/${id}`, {
                 method: 'DELETE'
             });
             refreshData();
+            Swal.fire('Deleted!', 'Tugas berhasil dihapus.', 'success');
         }
     };
 
@@ -131,72 +112,6 @@ function Dashboard({ onLogout }) {
                 <button onClick={onLogout} className="btn btn-danger">
                     Logout
                 </button>
-            </div>
-
-            <div className="stat-grid">
-                <div className="card">
-                    <h3>👥 Mahasiswa Terdaftar</h3>
-                    <div style={{ marginTop: '1rem' }}>
-                        {users.length > 0 ? (
-                            <div className="table-container">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Nama</th>
-                                            <th>NIM</th>
-                                            <th>Role</th>
-                                            {currentUser && currentUser.role === 'Admin' && <th>Aksi</th>}
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {users.map(u => (
-                                            <tr key={u.id}>
-                                                <td>{u.name}</td>
-                                                <td>{u.nim}</td>
-                                                <td>
-                                                    <span style={{
-                                                        padding: '0.25rem 0.5rem',
-                                                        borderRadius: '1rem',
-                                                        fontSize: '0.75rem',
-                                                        background: u.role === 'Admin' ? '#e0e7ff' : '#f3f4f6',
-                                                        color: u.role === 'Admin' ? '#4338ca' : '#374151',
-                                                        fontWeight: 600
-                                                    }}>
-                                                        {u.role}
-                                                    </span>
-                                                </td>
-                                                {currentUser && currentUser.role === 'Admin' && (
-                                                    <td>
-                                                        <button onClick={() => handleDeleteUser(u.id)} className="btn btn-danger btn-sm">
-                                                            Hapus
-                                                        </button>
-                                                    </td>
-                                                )}
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : <p className="text-muted">Memuat data user...</p>}
-                    </div>
-
-                    {/* FORM TAMBAH USER (KHUSUS ADMIN) */}
-                    {currentUser && currentUser.role === 'Admin' && (
-                        <div style={{ marginTop: '2rem', padding: '1.5rem', background: '#f8fafc', borderRadius: '8px' }}>
-                            <h4 style={{ marginBottom: '1rem' }}>➕ Tambah User Baru</h4>
-                            <form onSubmit={handleAddUser} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem' }}>
-                                <input name="name" className="input-field" placeholder="Nama" required />
-                                <input name="nim" className="input-field" placeholder="NIM" required />
-                                <select name="role" className="input-field">
-                                    <option value="User">User</option>
-                                    <option value="Admin">Admin</option>
-                                </select>
-                                <input name="password" type="password" className="input-field" placeholder="Password" required />
-                                <button type="submit" className="btn btn-success" style={{ backgroundColor: '#10b981', color: 'white' }}>Tambah</button>
-                            </form>
-                        </div>
-                    )}
-                </div>
             </div>
 
             <div className="card" style={{ marginBottom: '2rem' }}>

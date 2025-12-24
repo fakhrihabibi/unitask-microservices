@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 
+import Swal from 'sweetalert2';
+
 function Login({ setToken }) {
     const [nim, setNim] = useState('');
     const [password, setPassword] = useState('');
@@ -19,13 +21,29 @@ function Login({ setToken }) {
                 localStorage.setItem('token', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user)); // Simpan data user (termasuk role)
                 setToken(data.token);
+
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Login Berhasil!',
+                    text: 'Selamat datang kembali 👋',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
                 navigate('/');
             } else {
-                alert(data.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Gagal Login',
+                    text: data.message
+                });
             }
         } catch (error) {
             console.error('Login error:', error);
-            alert('Login failed');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Terjadi kesalahan pada server'
+            });
         }
     };
 
