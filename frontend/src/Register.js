@@ -29,33 +29,54 @@ function Register() {
     };
 
     return (
-        <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
-            <h2>Register</h2>
-            <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>Nama:</label>
-                    <input type="text" name="name" onChange={handleChange} style={{ width: '100%', padding: '8px' }} required />
-                </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>NIM:</label>
-                    <input type="text" name="nim" onChange={handleChange} style={{ width: '100%', padding: '8px' }} required />
-                </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>Role:</label>
-                    <select name="role" onChange={handleChange} style={{ width: '100%', padding: '8px' }}>
-                        <option value="User">User</option>
-                        <option value="Admin">Admin</option>
-                    </select>
-                </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>Password:</label>
-                    <input type="password" name="password" onChange={handleChange} style={{ width: '100%', padding: '8px' }} required />
-                </div>
-                <button type="submit" style={{ width: '100%', padding: '10px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px' }}>Register</button>
-            </form>
-            <p style={{ marginTop: '10px', textAlign: 'center' }}>
-                Sudah punya akun? <Link to="/login">Login di sini</Link>
-            </p>
+        <div className="center-box">
+            <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
+                <h2 className="text-center" style={{ marginBottom: '0.5rem' }}>Create Account</h2>
+                <p className="text-center text-muted" style={{ marginBottom: '2rem' }}>Join UniTask Manager today</p>
+
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label>Nama Lengkap</label>
+                        <input
+                            type="text"
+                            name="name"
+                            className="input-field"
+                            placeholder="Ex: Ahmad Fakhri"
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>NIM</label>
+                        <input
+                            type="text"
+                            name="nim"
+                            className="input-field"
+                            placeholder="Ex: 102022..."
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    {/* Role selection removed, defaults to User */}
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            name="password"
+                            className="input-field"
+                            placeholder="Minimum 6 characters"
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <button type="submit" className="btn btn-primary btn-block">
+                        Register Now
+                    </button>
+                </form>
+                <p className="text-center text-muted" style={{ marginTop: '1.5rem' }}>
+                    Sudah punya akun? <Link to="/login" style={{ color: 'var(--primary)', fontWeight: 600 }}>Login di sini</Link>
+                </p>
+            </div>
         </div>
     );
 }

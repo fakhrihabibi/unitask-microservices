@@ -17,6 +17,7 @@ function Login({ setToken }) {
             const data = await response.json();
             if (response.ok) {
                 localStorage.setItem('token', data.token);
+                localStorage.setItem('user', JSON.stringify(data.user)); // Simpan data user (termasuk role)
                 setToken(data.token);
                 navigate('/');
             } else {
@@ -29,22 +30,42 @@ function Login({ setToken }) {
     };
 
     return (
-        <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ddd', borderRadius: '8px' }}>
-            <h2>Login</h2>
-            <form onSubmit={handleSubmit}>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>NIM:</label>
-                    <input type="text" value={nim} onChange={(e) => setNim(e.target.value)} style={{ width: '100%', padding: '8px' }} required />
-                </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>Password:</label>
-                    <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} style={{ width: '100%', padding: '8px' }} required />
-                </div>
-                <button type="submit" style={{ width: '100%', padding: '10px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px' }}>Login</button>
-            </form>
-            <p style={{ marginTop: '10px', textAlign: 'center' }}>
-                Belum punya akun? <Link to="/register">Daftar di sini</Link>
-            </p>
+        <div className="center-box">
+            <div className="card" style={{ width: '100%', maxWidth: '400px' }}>
+                <h2 className="text-center" style={{ marginBottom: '1.5rem' }}>👋 Welcome Back</h2>
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <label>NIM</label>
+                        <input
+                            type="text"
+                            className="input-field"
+                            name="nim"
+                            value={nim}
+                            placeholder="Enter your NIM"
+                            onChange={(e) => setNim(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Password</label>
+                        <input
+                            type="password"
+                            className="input-field"
+                            name="password"
+                            value={password}
+                            placeholder="••••••••"
+                            onChange={(e) => setPassword(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <button type="submit" className="btn btn-primary btn-block">
+                        Login
+                    </button>
+                </form>
+                <p className="text-center text-muted" style={{ marginTop: '1.5rem' }}>
+                    Belum punya akun? <Link to="/register" style={{ color: 'var(--primary)', fontWeight: 600 }}>Daftar di sini</Link>
+                </p>
+            </div>
         </div>
     );
 }

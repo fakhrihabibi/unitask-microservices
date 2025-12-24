@@ -6,23 +6,40 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// PostgreSQL Connection Pool
 const pool = new Pool({
-  user: process.env.DB_USER,
-  host: process.env.DB_HOST,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASS,
-  port: 5432,
+    user: process.env.DB_USER || 'unitask',
+    host: process.env.DB_HOST || 'db',
+    database: process.env.DB_NAME || 'task_db',
+    password: process.env.DB_PASS || 'password',
+    port: 5432,
 });
 
-// Create Table
-pool.query(`CREATE TABLE IF NOT EXISTS tasks (
-    id SERIAL PRIMARY KEY,
-    title VARCHAR(100),
-    description TEXT,
-    deadline_date DATE,
-    deadline_time TIME,
-    status VARCHAR(20) DEFAULT 'TODO'
-)`);
+// Create Table with Retry
+async function initDB() {
+    let retries = 10;
+    while (retries > 0) {
+        try {
+            await pool.query('SELECT 1');
+
+            await pool.query(`CREATE TABLE IF NOT EXISTS tasks (
+                id SERIAL PRIMARY KEY,
+                title VARCHAR(100),
+                description TEXT,
+                deadline_date DATE,
+                deadline_time TIME,
+                status VARCHAR(20) DEFAULT 'TODO'
+            )`);
+            console.log("Task table verified");
+            break;
+        } catch (e) {
+            console.error(`DB Init Error: ${e.message}. Retrying in 5s...`);
+            retries--;
+            await new Promise(res => setTimeout(res, 5000));
+        }
+    }
+}
+initDB();
 
 app.get('/', async (req, res) => {
     try {
@@ -50,7 +67,6 @@ app.put('/:id/status', async (req, res) => {
     } catch (e) { res.status(500).json(e); }
 });
 
-// --- FITUR BARU: HAPUS TUGAS ---
 app.delete('/:id', async (req, res) => {
     try {
         await pool.query("DELETE FROM tasks WHERE id = $1", [req.params.id]);
