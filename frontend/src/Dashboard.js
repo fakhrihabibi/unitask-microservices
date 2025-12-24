@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
 
 function Dashboard({ onLogout }) {
     // State Data
@@ -100,6 +102,24 @@ function Dashboard({ onLogout }) {
         }
     };
 
+    // --- CALENDAR LOGIC ---
+    const onDateChange = (date) => {
+        // Adjust timezone offset to get correct local date string (YYYY-MM-DD)
+        const offset = date.getTimezoneOffset();
+        const localDate = new Date(date.getTime() - (offset * 60 * 1000));
+        const dateString = localDate.toISOString().split('T')[0];
+
+        setForm({ ...form, deadline_date: dateString });
+    };
+
+    const tileContent = ({ date, view }) => {
+        if (view === 'month') {
+            const dateString = date.toISOString().split('T')[0];
+            const hasTask = tasks.some(t => t.deadline_date && t.deadline_date.split('T')[0] === dateString);
+            return hasTask ? <div className="has-task-dot"></div> : null;
+        }
+    };
+
     // --- TAMPILAN DASHBOARD ---
     return (
         <div className="container">
@@ -180,22 +200,34 @@ function Dashboard({ onLogout }) {
             </div>
 
             <div className="card" style={{ marginBottom: '2rem' }}>
-                <h3>➕ Tambah Tugas</h3>
-                <form onSubmit={handleSubmit} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '1rem', alignItems: 'end' }}>
-                    <div className="form-group" style={{ marginBottom: 0 }}>
-                        <label>Judul Tugas</label>
-                        <input className="input-field" placeholder="Contoh: Laporan Akhir" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+                <h3>➕ Tambah Tugas (Pilih Tanggal)</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', alignItems: 'start' }}>
+                    {/* Calendar Section */}
+                    <div>
+                        <Calendar
+                            onChange={onDateChange}
+                            value={form.deadline_date ? new Date(form.deadline_date) : new Date()}
+                            tileContent={tileContent}
+                        />
                     </div>
-                    <div className="form-group" style={{ marginBottom: 0 }}>
-                        <label>Deadline Date</label>
-                        <input className="input-field" type="date" value={form.deadline_date} onChange={e => setForm({ ...form, deadline_date: e.target.value })} required />
-                    </div>
-                    <div className="form-group" style={{ marginBottom: 0 }}>
-                        <label>Time</label>
-                        <input className="input-field" type="time" value={form.deadline_time} onChange={e => setForm({ ...form, deadline_time: e.target.value })} required />
-                    </div>
-                    <button className="btn btn-primary" type="submit" style={{ height: '46px' }}>Simpan</button>
-                </form>
+
+                    {/* Form Section */}
+                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div className="form-group">
+                            <label>Judul Tugas</label>
+                            <input className="input-field" placeholder="Contoh: Laporan Akhir" value={form.title} onChange={e => setForm({ ...form, title: e.target.value })} required />
+                        </div>
+                        <div className="form-group">
+                            <label>Deadline Date</label>
+                            <input className="input-field" type="date" value={form.deadline_date} onChange={e => setForm({ ...form, deadline_date: e.target.value })} required />
+                        </div>
+                        <div className="form-group">
+                            <label>Time</label>
+                            <input className="input-field" type="time" value={form.deadline_time} onChange={e => setForm({ ...form, deadline_time: e.target.value })} required />
+                        </div>
+                        <button className="btn btn-primary btn-block" type="submit">Simpan Tugas</button>
+                    </form>
+                </div>
             </div>
 
             <div>
