@@ -4,17 +4,28 @@ services:
   db:
     image: postgres:15
     ports:
-      - "5432:5432"  # TAMBAHKAN BARIS INI
+      - "5432:5432"
     environment:
       POSTGRES_USER: unitask
       POSTGRES_PASSWORD: password
-      POSTGRES_DB: unitask_db
+      # POSTGRES_DB removed, handled by init script
+    volumes:
+      - ./init-scripts:/docker-entrypoint-initdb.d
     networks:
       - microservices-network
+
   user-service:
     build: ./user-service
     ports:
       - "3001:3001"
+    environment:
+      - DB_HOST=db
+      - DB_USER=unitask
+      - DB_PASS=password
+      - DB_NAME=user_db
+      - JWT_SECRET=supersecretkey
+    depends_on:
+      - db
     networks:
       - microservices-network
 
@@ -28,7 +39,7 @@ services:
       - DB_HOST=db
       - DB_USER=unitask
       - DB_PASS=password
-      - DB_NAME=unitask_db
+      - DB_NAME=task_db
     restart: always  
     networks:
       - microservices-network
