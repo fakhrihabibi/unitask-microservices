@@ -3,9 +3,12 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import Swal from 'sweetalert2';
 
+import { useNavigate } from 'react-router-dom';
+
 // ... imports ...
 
-function Dashboard({ onLogout }) {
+function Dashboard({ onLogout, user, token }) {
+    const navigate = useNavigate();
     // State Data
     const [tasks, setTasks] = useState([]);
     const [form, setForm] = useState({ title: '', description: '', deadline_date: '', deadline_time: '', category: 'General' });
@@ -165,7 +168,18 @@ function Dashboard({ onLogout }) {
     return (
         <div className="container">
             <div className="dashboard-header">
-                <div className="header-actions">
+                <div className="header-actions" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    {user && (
+                        <div style={{ textAlign: 'right', marginRight: '1rem' }}>
+                            <div style={{ fontWeight: 'bold' }}>{user.name}</div>
+                            <div style={{ fontSize: '0.8rem', opacity: 0.8 }}>{user.role}</div>
+                        </div>
+                    )}
+                    {user && user.role === 'Admin' && (
+                        <button onClick={() => navigate('/admin')} className="btn" style={{ background: 'var(--info)', color: 'white' }}>
+                            ⚙️ Admin Panel
+                        </button>
+                    )}
                     <button onClick={toggleTheme} className="btn" style={{ background: darkMode ? '#334155' : '#e2e8f0', color: darkMode ? '#fff' : '#333' }}>
                         {darkMode ? '☀️' : '🌙'}
                     </button>
@@ -303,6 +317,7 @@ function Dashboard({ onLogout }) {
                 </div>
                 {filteredTasks.length === 0 && <p className="text-center text-muted" style={{ fontStyle: 'italic', marginTop: '2rem' }}>Tidak ada tugas yang cocok.</p>}
             </div>
+
         </div>
     );
 }

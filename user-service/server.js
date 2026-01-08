@@ -42,6 +42,10 @@ async function initDB() {
                     password VARCHAR(255)
                 )
             `);
+
+            // Update old 'Student' role to 'Mahasiswa'
+            await pool.query("UPDATE users SET role = 'Mahasiswa' WHERE role = 'Student'");
+
             console.log("User table verified");
 
             // Seed Admin User (Habibi) - Ensure it exists and has correct password

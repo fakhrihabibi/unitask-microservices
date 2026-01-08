@@ -29,7 +29,8 @@ async function initDB() {
                 category VARCHAR(50) DEFAULT 'General',
                 deadline_date DATE,
                 deadline_time TIME,
-                status VARCHAR(20) DEFAULT 'TODO'
+                status VARCHAR(20) DEFAULT 'TODO',
+                user_nim VARCHAR(20)
             )`);
             console.log("Task table verified");
             break;
@@ -42,6 +43,7 @@ async function initDB() {
 }
 initDB();
 
+
 app.get('/', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM tasks ORDER BY deadline_date ASC');
@@ -50,22 +52,22 @@ app.get('/', async (req, res) => {
 });
 
 app.post('/', async (req, res) => {
-    const { title, description, category, deadline_date, deadline_time } = req.body;
+    const { title, description, category, deadline_date, deadline_time, user_nim } = req.body;
     try {
         await pool.query(
-            "INSERT INTO tasks (title, description, category, deadline_date, deadline_time, status) VALUES ($1, $2, $3, $4, $5, 'TODO')",
-            [title, description, category, deadline_date, deadline_time]
+            "INSERT INTO tasks (title, description, category, deadline_date, deadline_time, status, user_nim) VALUES ($1, $2, $3, $4, $5, 'TODO', $6)",
+            [title, description, category, deadline_date, deadline_time, user_nim]
         );
         res.status(201).json({ message: "Task added" });
     } catch (e) { console.error(e); res.status(500).json(e); }
 });
 
 app.put('/:id', async (req, res) => {
-    const { title, description, category, deadline_date, deadline_time } = req.body;
+    const { title, description, category, deadline_date, deadline_time, user_nim } = req.body;
     try {
         await pool.query(
-            "UPDATE tasks SET title = $1, description = $2, category = $3, deadline_date = $4, deadline_time = $5 WHERE id = $6",
-            [title, description, category, deadline_date, deadline_time, req.params.id]
+            "UPDATE tasks SET title = $1, description = $2, category = $3, deadline_date = $4, deadline_time = $5, user_nim = $6 WHERE id = $7",
+            [title, description, category, deadline_date, deadline_time, user_nim, req.params.id]
         );
         res.json({ message: "Task updated" });
     } catch (e) { res.status(500).json(e); }
