@@ -1,24 +1,45 @@
 :root {
   /* Modern Color Palette */
-  --primary: #4f46e5; /* Indigo */
+  --primary: #4f46e5;
+  /* Indigo */
   --primary-hover: #4338ca;
-  --secondary: #64748b; /* Slate */
-  --success: #10b981; /* Emerald */
-  --danger: #ef4444; /* Red */
-  --background: #f3f4f6; /* Cool Gray */
+  --secondary: #64748b;
+  /* Slate */
+  --success: #10b981;
+  /* Emerald */
+  --danger: #ef4444;
+  /* Red */
+  --background: #f3f4f6;
+  /* Cool Gray */
   --surface: #ffffff;
   --text-main: #1f2937;
   --text-muted: #6b7280;
   --border: #e5e7eb;
-  
+
   /* Spacing & Radius */
   --radius: 12px;
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  
+
   /* Typography */
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] {
+  --background: #0f172a;
+  /* Slate 900 */
+  --surface: #1e293b;
+  /* Slate 800 */
+  --text-main: #f1f5f9;
+  /* Slate 100 */
+  --text-muted: #94a3b8;
+  /* Slate 400 */
+  --border: #334155;
+  /* Slate 700 */
+  --primary: #6366f1;
+  /* Indigo 500 */
+  --primary-hover: #4f46e5;
 }
 
 body {

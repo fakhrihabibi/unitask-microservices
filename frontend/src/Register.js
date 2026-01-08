@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 function Register() {
     const [form, setForm] = useState({ name: '', nim: '', role: 'User', password: '' });
@@ -16,15 +17,31 @@ function Register() {
                 body: JSON.stringify(form)
             });
             if (response.ok) {
-                alert('Registrasi berhasil! Silakan login.');
-                navigate('/login');
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Registrasi Berhasil!',
+                    text: 'Silakan login untuk melanjutkan.',
+                    confirmButtonColor: '#4f46e5'
+                }).then(() => {
+                    navigate('/login');
+                });
             } else {
                 const data = await response.json();
-                alert('Registrasi gagal: ' + data.message);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Registrasi Gagal',
+                    text: data.message || 'Terjadi kesalahan.',
+                    confirmButtonColor: '#ef4444'
+                });
             }
         } catch (error) {
             console.error('Register error:', error);
-            alert('Register failed');
+            Swal.fire({
+                icon: 'error',
+                title: 'Error Koneksi',
+                text: 'Gagal menghubungi server.',
+                confirmButtonColor: '#ef4444'
+            });
         }
     };
 

@@ -26,6 +26,7 @@ async function initDB() {
                 id SERIAL PRIMARY KEY,
                 title VARCHAR(100),
                 description TEXT,
+                category VARCHAR(50) DEFAULT 'General',
                 deadline_date DATE,
                 deadline_time TIME,
                 status VARCHAR(20) DEFAULT 'TODO'
@@ -49,13 +50,24 @@ app.get('/', async (req, res) => {
 });
 
 app.post('/', async (req, res) => {
-    const { title, description, deadline_date, deadline_time } = req.body;
+    const { title, description, category, deadline_date, deadline_time } = req.body;
     try {
         await pool.query(
-            "INSERT INTO tasks (title, description, deadline_date, deadline_time, status) VALUES ($1, $2, $3, $4, 'TODO')",
-            [title, description, deadline_date, deadline_time]
+            "INSERT INTO tasks (title, description, category, deadline_date, deadline_time, status) VALUES ($1, $2, $3, $4, $5, 'TODO')",
+            [title, description, category, deadline_date, deadline_time]
         );
         res.status(201).json({ message: "Task added" });
+    } catch (e) { console.error(e); res.status(500).json(e); }
+});
+
+app.put('/:id', async (req, res) => {
+    const { title, description, category, deadline_date, deadline_time } = req.body;
+    try {
+        await pool.query(
+            "UPDATE tasks SET title = $1, description = $2, category = $3, deadline_date = $4, deadline_time = $5 WHERE id = $6",
+            [title, description, category, deadline_date, deadline_time, req.params.id]
+        );
+        res.json({ message: "Task updated" });
     } catch (e) { res.status(500).json(e); }
 });
 
